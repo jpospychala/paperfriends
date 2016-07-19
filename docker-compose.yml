@@ -1,0 +1,26 @@
+version: '2'
+
+services:
+  base:
+    image: base
+    build:
+      context: ./docker
+      dockerfile: base.Dockerfile
+
+  elixir:
+    image: elixir
+    build:
+      context: ./docker
+      dockerfile: elixir.Dockerfile
+
+  phoenix:
+    build:
+      context: .
+      dockerfile: docker/phoenix.Dockerfile
+    image: phoenix
+
+  paperfriends:
+    container_name: paperfriends
+    volumes:
+      - ./app:/app
+    image: phoenix
