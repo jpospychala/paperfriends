@@ -23,4 +23,9 @@ services:
     container_name: paperfriends
     volumes:
       - ./app:/app
+      - /root/.mix
     image: phoenix
+    working_dir: /app/website
+    entrypoint: mix phoenix.server
+    ports:
+      - "4000:4000"
