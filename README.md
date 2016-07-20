@@ -1,13 +1,13 @@
-Elixir playground
+Paper friends
 =================
+Exploring Elixir + Phoenix + Meteor.JS + WebGL stack
 
 1. Build docker images:
 ```
-$ docker-compose build base
-$ docker-compose build elixir
-$ docker-compose build phoenix
+$ docker-compose build base elixir phoenix
 ```
-2. Run elixir interactive shell inside docker:
+2. Launch paperfriends app:
 ```
-$ docker-compose run elixir bash
+$ docker-compose up paperfriends
 ```
+3. Your app should be up and running at http://localhost:4000
