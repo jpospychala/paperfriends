@@ -19,8 +19,8 @@ defmodule Website.Router do
     get "/", PageController, :index
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", Website do
-  #   pipe_through :api
-  # end
+  scope "/api", Website do
+     pipe_through :api
+     get "/sum", MathController, :sum
+  end
 end
