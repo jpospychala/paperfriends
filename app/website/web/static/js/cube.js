@@ -18,6 +18,24 @@ var render = function () {
   renderer.render(scene, camera);
 };
 
+var sync = {
+  start: function(channel) {
+    console.log("start")
+    setInterval(function() {
+      if (isLeading) {
+        channel.push("new_msg", {body: {x: cube.rotation.x, y: cube.rotation.y}});
+      }
+    }, 1000/25);
+
+    channel.on("new_msg", payload => {
+      if (!isLeading) {
+        cube.rotation.x = payload.body.x;
+        cube.rotation.y = payload.body.y;
+      }
+    });
+  }
+}
+
 let isLeading = false;
 let lastX = 0;
 let lastY = 0;
@@ -53,3 +71,5 @@ renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
 renderer.domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
 
 render();
+
+export default sync

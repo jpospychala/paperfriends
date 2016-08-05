@@ -13,10 +13,8 @@
 // to also remove its path from "config.paths.watched".
 import "phoenix_html"
 
-import socket from "./socket"
+import channel from "./socket"
 
-import "./cube"
-// Import local files
-//
-// Local files can be imported directly using relative
-// paths "./socket" or full ones "web/static/js/socket".
+import sync from "./cube"
+
+sync.start(channel)
