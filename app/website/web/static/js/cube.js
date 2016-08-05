@@ -15,10 +15,41 @@ camera.position.z = 5;
 var render = function () {
   requestAnimationFrame( render );
 
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.05;
-
   renderer.render(scene, camera);
 };
+
+let isLeading = false;
+let lastX = 0;
+let lastY = 0;
+
+let onDocumentMouseMove = function(event) {
+	event.preventDefault();
+  if (event.buttons != /*LMB*/1) {
+    return;
+  }
+
+  let newX = event.clientX / window.innerWidth;
+  cube.rotation.y += 10*(newX - (lastX || newX));
+  lastX = newX;
+
+  let newY = event.clientY / window.innerHeight;
+  cube.rotation.x += 10*(newY - (lastY || newY));
+  lastY = newY;
+}
+
+let onDocumentMouseDown = function(event) {
+  isLeading = true;
+}
+
+let onDocumentMouseUp = function(event) {
+  isLeading = false;
+  lastX = 0;
+  lastY = 0;
+}
+
+
+renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
+renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
+renderer.domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
 
 render();
