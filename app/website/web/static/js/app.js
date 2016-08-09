@@ -12,9 +12,9 @@
 // If you no longer want to use a dependency, remember
 // to also remove its path from "config.paths.watched".
 import "phoenix_html"
+import socket from "./socket"
+import state from "./scene"
+import sync from "./sync"
 
-import channel from "./socket"
-
-import sync from "./cube"
-
-sync.start(channel)
+state.name = "scene";
+sync.start(socket, state)

@@ -12,31 +12,27 @@ scene.add( cube );
 
 camera.position.z = 5;
 
+var state = {
+  refresh: newState => {
+    console.log('refresh');
+    cube.rotation.x = newState.x;
+    cube.rotation.y = newState.y;
+  },
+  capture: () => {
+    console.log('caputre');
+    return {
+    x: cube.rotation.x,
+    y: cube.rotation.y
+  }; },
+  isChanging: false
+};
+
 var render = function () {
   requestAnimationFrame( render );
 
   renderer.render(scene, camera);
 };
 
-var sync = {
-  start: function(channel) {
-    console.log("start")
-    setInterval(function() {
-      if (isLeading) {
-        channel.push("new_msg", {body: {x: cube.rotation.x, y: cube.rotation.y}});
-      }
-    }, 1000/25);
-
-    channel.on("new_msg", payload => {
-      if (!isLeading) {
-        cube.rotation.x = payload.body.x;
-        cube.rotation.y = payload.body.y;
-      }
-    });
-  }
-}
-
-let isLeading = false;
 let lastX = 0;
 let lastY = 0;
 
@@ -53,18 +49,17 @@ let onDocumentMouseMove = function(event) {
   let newY = event.clientY / window.innerHeight;
   cube.rotation.x += 10*(newY - (lastY || newY));
   lastY = newY;
-}
+};
 
 let onDocumentMouseDown = function(event) {
-  isLeading = true;
-}
+  state.isChanging = true;
+};
 
 let onDocumentMouseUp = function(event) {
-  isLeading = false;
+  state.isChanging = false;
   lastX = 0;
   lastY = 0;
-}
-
+};
 
 renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
 renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
@@ -72,4 +67,4 @@ renderer.domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
 
 render();
 
-export default sync
+export default state;
