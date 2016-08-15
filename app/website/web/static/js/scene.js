@@ -5,27 +5,34 @@ var renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
-var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-var cube = new THREE.Mesh( geometry, material );
-scene.add( cube );
+let svgPathToShape = function(str) {
+  var pts = str.split(/[ ,]/);
+  var x = 0, y = 0;
+  var shape = new THREE.Shape();
+  for (var i = 0; i < pts.length; i+= 2) {
+    var dx = pts[i]*0.01;
+    var dy = pts[i+1]*0.01;
+    x += dx;
+    y -= dy;
+    shape.lineTo(x, y);
+  }
+  return shape;
+}
+let drawCar = function() {
+  var shape = svgPathToShape("0,-30 70,-10 20,-50 110,0 30,50 0,40");
+  var extrudeSettings = { amount: 1.5, bevelEnabled: false, steps: 1 };
+  var geometry = shape.extrude(extrudeSettings);
+
+  var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+  var mesh = new THREE.Mesh(geometry, material);
+  return mesh;
+};
+
+//var cube = drawCube();
+var cube = drawCar();
+scene.add(cube);
 
 camera.position.z = 5;
-
-var state = {
-  refresh: newState => {
-    console.log('refresh');
-    cube.rotation.x = newState.x;
-    cube.rotation.y = newState.y;
-  },
-  capture: () => {
-    console.log('caputre');
-    return {
-    x: cube.rotation.x,
-    y: cube.rotation.y
-  }; },
-  isChanging: false
-};
 
 var render = function () {
   requestAnimationFrame( render );
@@ -59,6 +66,22 @@ let onDocumentMouseUp = function(event) {
   state.isChanging = false;
   lastX = 0;
   lastY = 0;
+};
+
+
+var state = {
+  refresh: newState => {
+    console.log('refresh');
+    cube.rotation.x = newState.x;
+    cube.rotation.y = newState.y;
+  },
+  capture: () => {
+    console.log('caputre');
+    return {
+    x: cube.rotation.x,
+    y: cube.rotation.y
+  }; },
+  isChanging: false
 };
 
 renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
