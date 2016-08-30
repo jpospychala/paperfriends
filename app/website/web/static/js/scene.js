@@ -1,4 +1,4 @@
-import Car from "./car"
+import Car from "./car";
 
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
@@ -10,9 +10,11 @@ document.body.appendChild( renderer.domElement );
 
 var car = new Car();
 var cube = car.mesh();
+cube.rotateY(Math.PI/3);
 scene.add(cube);
 
-camera.position.z = 3;
+camera.position.z = 300;
+camera.position.y = 50;
 
 var render = function () {
   requestAnimationFrame( render );
