@@ -31,11 +31,11 @@ let rect = function(dx, dy, z) {
   return shape;
 };
 
-function Car() {
-  this.width = 100;
-  this.outline = svgPathToPoints("0,-30 70,-10 20,-50 110,0 30,50 0,40 -230,0");
+function Car(model) {
+  this.model = model;
+  this.outline = svgPathToPoints(this.model.outlinePoints);
 
-  var boxMaterials = loadMaterials();
+  var boxMaterials = loadMaterials(this.model.color, this.model.faces);
 
   this.mesh = function() {
     var shape = pointsToShape(this.outline);
@@ -48,13 +48,13 @@ function Car() {
     group.add(lmesh);
 
     var rmesh = new THREE.Mesh(geometry, boxMaterials[1]);
-    rmesh.position.z = -this.width;
+    rmesh.position.z = -this.model.width;
     group.add(rmesh);
     var front = new THREE.Group();
     front.rotateY(PI/2);
     for (var i = 0; i < this.outline.length; i++) {
       var p1 = this.outline[i];
-      var sideShape = rect(p1.dx, p1.dy, this.width);
+      var sideShape = rect(p1.dx, p1.dy, this.model.width);
       var shapeGeometry = sideShape.makeGeometry();
       rescaleUvs(shapeGeometry);
       var sideMesh = new THREE.Mesh(shapeGeometry, boxMaterials[2 + i]);
@@ -70,7 +70,7 @@ function Car() {
     }
     group.add(front);
     group.translateX(-geometry.boundingBox.max.x/2);
-    group.translateZ(this.width/2);
+    group.translateZ(this.model.width/2);
 
     var center = new THREE.Group();
     center.add(group);
@@ -95,27 +95,16 @@ let rescaleUvs = geometry => {
   });
 };
 
-let loadMaterials = () => {
+let loadMaterials = (defaultColor, faces) => {
   var txl = new THREE.TextureLoader();
-  var tx1 = txl.load( "images/pizza-left.png" );
-  var tx2 = txl.load( "images/pizza-right.png" );
-  var tx3 = txl.load( "images/pizza-mid1.png" );
-  var tx4 = txl.load( "images/pizza-mid3.png" );
-  var tx5 = txl.load( "images/pizza-mid5.png" );
-  var tx6 = txl.load( "images/pizza-mid6.png" );
-
-  var materials = [
-     new THREE.MeshBasicMaterial({map: tx1, side: THREE.DoubleSide }),
-     new THREE.MeshBasicMaterial({map: tx2, side: THREE.DoubleSide}),
-     new THREE.MeshBasicMaterial({map: tx3, side: THREE.DoubleSide }),
-     new THREE.MeshBasicMaterial({color:0xe6e6e6, side: THREE.DoubleSide}),
-     new THREE.MeshBasicMaterial({map: tx4, side: THREE.DoubleSide}),
-     new THREE.MeshBasicMaterial({color:0xe6e6e6, side: THREE.DoubleSide}),
-     new THREE.MeshBasicMaterial({map: tx5, side: THREE.DoubleSide}),
-     new THREE.MeshBasicMaterial({map: tx6, side: THREE.DoubleSide}),
-     new THREE.MeshBasicMaterial({color:0xe6e6e6, side: THREE.DoubleSide})
-  ];
-  return materials;
+  txl.setPath("images/");
+  return faces.map(path => {
+    var opts = {color: defaultColor, side: THREE.DoubleSide };
+    if (path) {
+      opts.map = txl.load(path);
+    }
+    return new THREE.MeshBasicMaterial(opts);
+  });
 };
 
 export default Car;

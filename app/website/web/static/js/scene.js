@@ -8,7 +8,24 @@ renderer.setSize( window.innerWidth, window.innerHeight );
 renderer.setClearColor(0xffffff, 1);
 document.body.appendChild( renderer.domElement );
 
-var car = new Car();
+var pizzaCar = {
+  width: 100,
+  outlinePoints: "0,-30 70,-10 20,-50 110,0 30,50 0,40 -230,0",
+  faces: [
+    "pizza-left.png",
+    "pizza-right.png",
+    "pizza-mid1.png",
+    null,
+    "pizza-mid3.png",
+    null,
+    "pizza-mid5.png",
+    "pizza-mid6.png",
+    null
+  ],
+  color: 0xe6e6e6
+};
+
+var car = new Car(pizzaCar);
 var cube = car.mesh();
 cube.rotateY(Math.PI/3);
 scene.add(cube);
