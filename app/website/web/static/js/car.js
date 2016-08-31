@@ -33,7 +33,7 @@ let rect = function(dx, dy, z) {
 
 function Car() {
   this.width = 100;
-  this.outline = svgPathToPoints("0,-30 70,-10 20,-50 110,0 30,50 0,40");
+  this.outline = svgPathToPoints("0,-30 70,-10 20,-50 110,0 30,50 0,40 -230,0");
 
   var boxMaterials = loadMaterials();
 
@@ -61,14 +61,15 @@ function Car() {
       sideMesh.position.set(0, p1.y, p1.x);
 
       var upright = p1.dx >= 0 && p1.dy < 0 ? -1 : 0;
-      var horiz = p1.dy === 0 ? PI/2 : 0;
+      var horizright = p1.dy === 0 && p1.dx > 0 ? PI/2 : 0;
+      var horizleft = p1.dy === 0 && p1.dx <= 0 ? -PI/2 : 0;
       var downright = p1.dx >= 0 && p1.dy > 0 ? 1 : 0;
       var atan =  Math.atan(p1.dx/p1.dy);
-      sideMesh.rotateX(PI + upright * atan + horiz + downright * (PI - atan));
+      sideMesh.rotateX(PI + upright * atan + horizright + horizleft + downright * (PI - atan));
       front.add(sideMesh);
     }
     group.add(front);
-    group.translateX(-this.outline[this.outline.length - 1].x/2);
+    group.translateX(-geometry.boundingBox.max.x/2);
     group.translateZ(this.width/2);
 
     var center = new THREE.Group();
@@ -111,7 +112,8 @@ let loadMaterials = () => {
      new THREE.MeshBasicMaterial({map: tx4, side: THREE.DoubleSide}),
      new THREE.MeshBasicMaterial({color:0xe6e6e6, side: THREE.DoubleSide}),
      new THREE.MeshBasicMaterial({map: tx5, side: THREE.DoubleSide}),
-     new THREE.MeshBasicMaterial({map: tx6, side: THREE.DoubleSide})
+     new THREE.MeshBasicMaterial({map: tx6, side: THREE.DoubleSide}),
+     new THREE.MeshBasicMaterial({color:0xe6e6e6, side: THREE.DoubleSide})
   ];
   return materials;
 };
