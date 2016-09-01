@@ -23,10 +23,10 @@ var pizzaCar = {
     null
   ],
   wheels: [
-    {x: 40, y: 0, z: 1, r: 20},
-    {x: 180, y: 0, z: 1, r: 20},
-    {x: 40, y: 0, z: -101, r: 20},
-    {x: 180, y: 0, z: -101, r: 20},
+    {x: 40, y: 0, z: 1, r: 20, face: "wheel-1.png"},
+    {x: 180, y: 0, z: 1, r: 20, face: "wheel-1.png"},
+    {x: 40, y: 0, z: -101, r: 20, face: "wheel-1.png"},
+    {x: 180, y: 0, z: -101, r: 20, face: "wheel-1.png"},
   ],
   color: 0xe6e6e6
 };

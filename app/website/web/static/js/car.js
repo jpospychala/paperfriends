@@ -35,7 +35,7 @@ function Car(model) {
   this.model = model;
   this.outline = svgPathToPoints(this.model.outlinePoints);
 
-  var boxMaterials = loadMaterials(this.model.color, this.model.faces);
+  var materials = new Materials();
 
   this.mesh = function() {
     var shape = pointsToShape(this.outline);
@@ -44,10 +44,11 @@ function Car(model) {
 
     var group = new THREE.Group();
 
-    var lmesh = new THREE.Mesh(geometry, boxMaterials[0]);
+    materials.setDefaultColor(this.model.color);
+    var lmesh = new THREE.Mesh(geometry, materials.get(this.model.faces[0]));
     group.add(lmesh);
 
-    var rmesh = new THREE.Mesh(geometry, boxMaterials[1]);
+    var rmesh = new THREE.Mesh(geometry, materials.get(this.model.faces[1]));
     rmesh.position.z = -this.model.width;
     group.add(rmesh);
     var front = new THREE.Group();
@@ -57,7 +58,7 @@ function Car(model) {
       var sideShape = rect(p1.dx, p1.dy, this.model.width);
       var shapeGeometry = sideShape.makeGeometry();
       rescaleUvs(shapeGeometry);
-      var sideMesh = new THREE.Mesh(shapeGeometry, boxMaterials[2 + i]);
+      var sideMesh = new THREE.Mesh(shapeGeometry, materials.get(this.model.faces[i + 2]));
       sideMesh.position.set(0, p1.y, p1.x);
 
       var upright = p1.dx >= 0 && p1.dy < 0 ? -1 : 0;
@@ -74,7 +75,7 @@ function Car(model) {
 
     this.model.wheels.forEach(wheel => {
       var geometry = new THREE.CircleGeometry(wheel.r, 32);
-      var material = new THREE.MeshBasicMaterial( { color: 0x000000, side: THREE.DoubleSide } );
+      var material = materials.get(wheel.face);
       var circle = new THREE.Mesh(geometry, material);
       circle.translateX(wheel.x);
       circle.translateY(wheel.y);
@@ -105,16 +106,30 @@ let rescaleUvs = geometry => {
   });
 };
 
-let loadMaterials = (defaultColor, faces) => {
+function Materials() {
   var txl = new THREE.TextureLoader();
   txl.setPath("images/");
-  return faces.map(path => {
-    var opts = {color: defaultColor, side: THREE.DoubleSide };
+  this.defaultColor = undefined;
+  this.cache = {};
+
+  this.get = (path) => {
+    if (! this.cache[path]) {
+      this.cache[path] = load(path);
+    }
+    return this.cache[path];
+  };
+
+  this.setDefaultColor = newColor => {
+    this.defaultColor = newColor;
+  };
+
+  var load = (path) => {
+    var opts = {color: this.defaultColor, side: THREE.DoubleSide };
     if (path) {
       opts.map = txl.load(path);
     }
     return new THREE.MeshBasicMaterial(opts);
-  });
-};
+  };
+}
 
 export default Car;
