@@ -72,6 +72,16 @@ function Car(model) {
     group.translateX(-geometry.boundingBox.max.x/2);
     group.translateZ(this.model.width/2);
 
+    this.model.wheels.forEach(wheel => {
+      var geometry = new THREE.CircleGeometry(wheel.r, 32);
+      var material = new THREE.MeshBasicMaterial( { color: 0x000000, side: THREE.DoubleSide } );
+      var circle = new THREE.Mesh(geometry, material);
+      circle.translateX(wheel.x);
+      circle.translateY(wheel.y);
+      circle.translateZ(wheel.z);
+      group.add(circle);
+    });
+
     var center = new THREE.Group();
     center.add(group);
 
@@ -85,9 +95,9 @@ let rescaleUvs = geometry => {
   }
   let dx = geometry.boundingBox.max.x - geometry.boundingBox.min.x;
   let dy = geometry.boundingBox.max.y - geometry.boundingBox.min.y;
-  geometry.faceVertexUvs.map(face => {
-    face.map(triangle => {
-      triangle.map(vertex => {
+  geometry.faceVertexUvs.forEach(face => {
+    face.forEach(triangle => {
+      triangle.forEach(vertex => {
         vertex.x = vertex.x / dx;
         vertex.y = vertex.y / dy;
       });

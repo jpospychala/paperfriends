@@ -22,6 +22,12 @@ var pizzaCar = {
     "pizza-mid6.png",
     null
   ],
+  wheels: [
+    {x: 40, y: 0, z: 1, r: 20},
+    {x: 180, y: 0, z: 1, r: 20},
+    {x: 40, y: 0, z: -101, r: 20},
+    {x: 180, y: 0, z: -101, r: 20},
+  ],
   color: 0xe6e6e6
 };
 
