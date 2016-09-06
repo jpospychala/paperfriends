@@ -8,3 +8,12 @@ config :website, Website.Endpoint,
 
 # Print only warnings and errors during test
 config :logger, level: :warn
+
+# Configure your database
+config :website, Website.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  username: System.get_env("POSTGRES_USER"),
+  password: System.get_env("POSTGRES_PASSWORD"),
+  database: System.get_env("POSTGRES_USER"),
+  hostname: "postgres",
+  pool: Ecto.Adapters.SQL.Sandbox

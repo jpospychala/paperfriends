@@ -1,0 +1,3 @@
+POSTGRES_PASSWORD=paperfriends
+POSTGRES_USER=paperfriends
+PGDATA=/data/pgdata

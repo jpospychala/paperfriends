@@ -18,13 +18,21 @@ defmodule Website.Web do
 
   def model do
     quote do
-      # Define common model functionality
+      use Ecto.Schema
+
+      import Ecto
+      import Ecto.Changeset
+      import Ecto.Query
     end
   end
 
   def controller do
     quote do
       use Phoenix.Controller
+
+      alias Website.Repo
+      import Ecto
+      import Ecto.Query
 
       import Website.Router.Helpers
       import Website.Gettext
@@ -56,6 +64,10 @@ defmodule Website.Web do
   def channel do
     quote do
       use Phoenix.Channel
+
+      alias Website.Repo
+      import Ecto
+      import Ecto.Query
       import Website.Gettext
     end
   end

@@ -7,6 +7,16 @@ services:
       context: ./docker
       dockerfile: base.Dockerfile
 
+  postgres:
+    container_name: postgres
+    image: postgres:9.5.4
+    env_file:
+      - env_variables
+    volumes:
+      - ./data:/data
+    ports:
+      - "5432:5432"
+
   elixir:
     image: elixir
     build:
@@ -21,6 +31,8 @@ services:
 
   paperfriends:
     container_name: paperfriends
+    env_file:
+      - env_variables
     volumes:
       - ./app:/app
       - /root/.mix
@@ -29,3 +41,5 @@ services:
     entrypoint: mix phoenix.server
     ports:
       - "4000:4000"
+    links:
+      - postgres
