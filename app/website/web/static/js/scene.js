@@ -8,36 +8,18 @@ renderer.setSize( window.innerWidth, window.innerHeight );
 renderer.setClearColor(0xffffff, 1);
 document.body.appendChild( renderer.domElement );
 
-var pizzaCar = {
-  width: 100,
-  outlinePoints: "0,-30 70,-10 20,-50 110,0 30,50 0,40 -230,0",
-  faces: [
-    "pizza-left.png",
-    "pizza-right.png",
-    "pizza-mid1.png",
-    null,
-    "pizza-mid3.png",
-    null,
-    "pizza-mid5.png",
-    "pizza-mid6.png",
-    null
-  ],
-  wheels: [
-    {x: 40, y: 0, z: 1, r: 20, face: "wheel-1.png"},
-    {x: 180, y: 0, z: 1, r: 20, face: "wheel-1.png"},
-    {x: 40, y: 0, z: -101, r: 20, face: "wheel-1.png"},
-    {x: 180, y: 0, z: -101, r: 20, face: "wheel-1.png"},
-  ],
-  color: 0xe6e6e6
-};
-
-var car = new Car(pizzaCar);
-var cube = car.mesh();
-cube.rotateY(Math.PI/3);
-scene.add(cube);
-
 camera.position.z = 300;
 camera.position.y = 50;
+
+var cube = undefined;
+$.getJSON('/api/models/1', function(response) {
+  var pizzaCar = response.data.body;
+
+  var car = new Car(pizzaCar);
+  cube = car.mesh();
+  cube.rotateY(Math.PI/3);
+  scene.add(cube);
+});
 
 var render = function () {
   requestAnimationFrame( render );

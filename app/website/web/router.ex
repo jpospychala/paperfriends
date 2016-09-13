@@ -22,5 +22,6 @@ defmodule Website.Router do
   scope "/api", Website do
      pipe_through :api
      get "/sum", MathController, :sum
+     resources "/models", ModelController, except: [:new, :edit]
   end
 end
