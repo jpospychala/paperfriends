@@ -1,25 +1,27 @@
 import Car from "./car";
 
-var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+var scene;
+var camera;
+var renderer;
+var cube;
 
-var renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-renderer.setClearColor(0xffffff, 1);
-document.body.appendChild( renderer.domElement );
+var init = (element) => {
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+  camera.position.z = 300;
+  camera.position.y = 50;
 
-camera.position.z = 300;
-camera.position.y = 50;
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize( window.innerWidth, window.innerHeight );
+  renderer.setClearColor(0xffffff, 1);
 
-var cube = undefined;
-$.getJSON('/api/models/1', function(response) {
-  var pizzaCar = response.data.body;
+  renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
+  renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
+  renderer.domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
 
-  var car = new Car(pizzaCar);
-  cube = car.mesh();
-  cube.rotateY(Math.PI/3);
-  scene.add(cube);
-});
+  element.appendChild( renderer.domElement );
+};
+
 
 var render = function () {
   requestAnimationFrame( render );
@@ -66,13 +68,15 @@ var state = {
     x: cube.rotation.x,
     y: cube.rotation.y
   }; },
-  isChanging: false
+  isChanging: false,
+  loadModel: function(element, model) {
+    init(element);
+    var car = new Car(model);
+    cube = car.mesh();
+    cube.rotateY(Math.PI/3);
+    scene.add(cube);
+    render();
+  }
 };
-
-renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
-renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
-renderer.domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
-
-render();
 
 export default state;
