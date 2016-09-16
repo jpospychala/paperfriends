@@ -10,12 +10,30 @@ sync.start(socket, state);
 var vm = new Vue({
   el: "#scene",
   data: {
-    message: "Paperfriends"
+    message: "Paperfriends",
+    editable: "",
+    model: {},
+    error: undefined
   },
   ready: function () {
-    var element = this.$el;
-    $.getJSON('/api/models/1', function(response) {
-      state.loadModel(element, response.data.body);
+    $.getJSON('/api/models/1', (response) => {
+      this.model = response.data;
+      this.editable = JSON.stringify(this.model.body, true, 2);
+
+      var viewPlace = $(this.$el).find("#view3d")[0];
+      state.init(viewPlace);
+      state.loadModel(this.model.body);
     });
+  },
+  methods: {
+    applyChanges: function() {
+      try {
+        this.model.body = JSON.parse(this.editable);
+        this.error = undefined;
+        state.loadModel(this.model.body);
+      } catch (ex) {
+        this.error = ex;
+      }
+    }
   }
 });

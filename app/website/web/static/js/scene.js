@@ -69,8 +69,10 @@ var state = {
     y: cube.rotation.y
   }; },
   isChanging: false,
-  loadModel: function(element, model) {
-    init(element);
+  init: init,
+  loadModel: function(model) {
+    scene.children.length > 0 ? scene.remove(scene.children[0]) : undefined;
+
     var car = new Car(model);
     cube = car.mesh();
     cube.rotateY(Math.PI/3);

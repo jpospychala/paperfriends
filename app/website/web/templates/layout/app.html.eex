@@ -8,7 +8,7 @@
     <meta name="author" content="">
 
     <title>Paperfriends</title>
-    <link rel="stylesheet" href=/css/app.css">
+    <link rel="stylesheet" href="/css/app.css">
   </head>
 
   <body>
@@ -16,7 +16,15 @@
       Paperfriends
     </h1>
     <div class="container">
-      <div id="scene">
+      <div class="row" id="scene">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" id="view3d">
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+          <textarea v-model="editable" rows=20 cols=60>
+          </textarea>
+          <button type="input" v-on:click="applyChanges()">Change</button>
+            {{ error }}
+        </div>
       </div>
     </div> <!-- /container -->
     <script src="/js/app.js"></script>
