@@ -34,6 +34,19 @@ var vm = new Vue({
       } catch (ex) {
         this.error = ex;
       }
+    },
+    save: function() {
+      this.applyChanges();
+      $.ajax({
+        type: "PUT",
+        url: "/api/models/1",
+        data: JSON.stringify({model: this.model}),
+        success: (response) => {
+          console.log(response);
+        },
+        contentType: "application/json",
+        dataType: "json"
+      });
     }
   }
 });
