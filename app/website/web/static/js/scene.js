@@ -6,13 +6,15 @@ var renderer;
 var cube;
 
 var init = (element) => {
+  var width = element.clientWidth;
+  var height = window.innerHeight *0.6;
   scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+  camera = new THREE.PerspectiveCamera( 50, width/height, 0.1, 1000 );
   camera.position.z = 300;
   camera.position.y = 50;
 
   renderer = new THREE.WebGLRenderer();
-  renderer.setSize( window.innerWidth, window.innerHeight );
+  renderer.setSize( width, height );
   renderer.setClearColor(0xffffff, 1);
 
   renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
