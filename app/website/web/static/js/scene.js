@@ -1,4 +1,4 @@
-import Car from "./car";
+import ModelBuilder from "./modelBuilder";
 
 var scene;
 var camera;
@@ -75,8 +75,8 @@ var state = {
   loadModel: function(model) {
     scene.children.length > 0 ? scene.remove(scene.children[0]) : undefined;
 
-    var car = new Car(model);
-    cube = car.mesh();
+    var modelBuilder = new ModelBuilder();
+    cube = modelBuilder.buildMesh(model);
     cube.rotateY(Math.PI/3);
     scene.add(cube);
     render();
