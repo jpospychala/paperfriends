@@ -12,11 +12,12 @@
   </head>
 
   <body>
-    <h1 id="app">
-      Paperfriends
-    </h1>
-    <div class="container">
-      <div class="row" id="scene">
+    <div class="container" id="scene">
+      <div class="row">
+        <h2>{{model.name}}</h2>
+        {{model.description}}
+      </div>
+      <div class="row">
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" id="view3d">
         </div>
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
