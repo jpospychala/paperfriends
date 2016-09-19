@@ -6,7 +6,9 @@ function ModelBuilder() {
   this.buildMesh = function(model) {
     var group = new THREE.Group();
     model.parts.forEach(part => {
-      var partMesh = shapes[part.type](part, materials);
+      var shape = shapes[part.type];
+      var partMesh = shape.mesh(part, materials);
+      shape.position(partMesh, part);
       group.add(partMesh);
     });
 
@@ -19,52 +21,68 @@ function ModelBuilder() {
 
 
 const shapes = {
-  wheel: function(model, materials) {
-    var geometry = new THREE.CircleGeometry(model.r, 32);
-    var material = materials.get(model.face);
-    var circle = new THREE.Mesh(geometry, material);
-    circle.translateX(model.x);
-    circle.translateY(model.y);
-    circle.translateZ(model.z);
-    return circle;
-  },
-  extruded: function(model, materials) {
-    var outline = svgPathToPoints(model.outlinePoints);
-    outline = connectLastToFirst(outline);
-    var shape = pointsToShape(outline);
-    var geometry = shape.makeGeometry();
-    rescaleUvs(geometry);
-
-    materials.setDefaultColor(model.color);
-
-    var group = new THREE.Group();
-    var lmesh = new THREE.Mesh(geometry, materials.get(model.faces[0]));
-    group.add(lmesh);
-
-    var rmesh = new THREE.Mesh(geometry, materials.get(model.faces[1]));
-    rmesh.position.z = -model.width;
-    group.add(rmesh);
-
-    var front = new THREE.Group();
-    front.rotateY(PI/2);
-    for (var i = 0; i < outline.length; i++) {
-      var p1 = outline[i];
-      var sideShape = rect(p1.dx, p1.dy, model.width);
-      var shapeGeometry = sideShape.makeGeometry();
-      rescaleUvs(shapeGeometry);
-      var sideMesh = new THREE.Mesh(shapeGeometry, materials.get(model.faces[i + 2]));
-      sideMesh.position.set(0, p1.y, p1.x);
-
-      var upright = p1.dx >= 0 && p1.dy < 0 ? -1 : 0;
-      var horizright = p1.dy === 0 && p1.dx > 0 ? PI/2 : 0;
-      var horizleft = p1.dy === 0 && p1.dx <= 0 ? -PI/2 : 0;
-      var downright = p1.dx >= 0 && p1.dy > 0 ? 1 : 0;
-      var atan =  Math.atan(p1.dx/p1.dy);
-      sideMesh.rotateX(PI + upright * atan + horizright + horizleft + downright * (PI - atan));
-      front.add(sideMesh);
+  wheel: {
+    mesh: (model, materials) => {
+      var geometry = new THREE.CircleGeometry(model.r, 32);
+      var material = materials.get(model.face);
+      return new THREE.Mesh(geometry, material);
+    },
+    position: (mesh, model) => {
+      mesh.translateX(model.x);
+      mesh.translateY(model.y);
+      mesh.translateZ(model.z);
     }
-    group.add(front);
-    return group;
+  },
+  extruded: {
+    mesh: (model, materials) => {
+      var outline = svgPathToPoints(model.outlinePoints);
+      outline = connectLastToFirst(outline);
+      var shape = pointsToShape(outline);
+      var geometry = shape.makeGeometry();
+      rescaleUvs(geometry);
+
+      materials.setDefaultColor(model.color);
+
+      var group = new THREE.Group();
+      group.userData.outline = outline;
+      var lmesh = new THREE.Mesh(geometry, materials.get(model.faces[0]));
+      group.add(lmesh);
+
+      var rmesh = new THREE.Mesh(geometry, materials.get(model.faces[1]));
+      group.add(rmesh);
+
+      var front = new THREE.Group();
+      for (var i = 0; i < outline.length; i++) {
+        var p1 = outline[i];
+        var sideShape = rect(p1.dx, p1.dy, model.width);
+        var shapeGeometry = sideShape.makeGeometry();
+        rescaleUvs(shapeGeometry);
+        var sideMesh = new THREE.Mesh(shapeGeometry, materials.get(model.faces[i + 2]));
+
+        front.add(sideMesh);
+      }
+      group.add(front);
+      return group;
+    },
+    position: (mesh, model) => {
+      var rmesh = mesh.children[1];
+      rmesh.position.z = -model.width;
+
+      var front = mesh.children[2];
+      front.rotateY(PI/2);
+
+      for (var i = 0; i < front.children.length; i++) {
+        var sideMesh = front.children[i];
+        var p1 = mesh.userData.outline[i];
+        sideMesh.position.set(0, p1.y, p1.x);
+        var upright = p1.dx >= 0 && p1.dy < 0 ? -1 : 0;
+        var horizright = p1.dy === 0 && p1.dx > 0 ? PI/2 : 0;
+        var horizleft = p1.dy === 0 && p1.dx <= 0 ? -PI/2 : 0;
+        var downright = p1.dx >= 0 && p1.dy > 0 ? 1 : 0;
+        var atan =  Math.atan(p1.dx/p1.dy);
+        sideMesh.rotateX(PI + upright * atan + horizright + horizleft + downright * (PI - atan));
+      }
+    }
   }
 };
 
