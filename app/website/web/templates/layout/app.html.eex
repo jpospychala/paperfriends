@@ -21,10 +21,13 @@
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" id="view3d">
         </div>
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+          <input type="text" v-model="model.name">
+          <input type="text" v-model="model.description">
           <textarea v-model="editable" rows=20 cols=60>
           </textarea>
           <button type="input" v-on:click="applyChanges()">Preview</button>
           <button type="input" v-on:click="save()">Save</button>
+          <button type="input" v-on:click="create()">Create</button>
             {{ error }}
         </div>
       </div>

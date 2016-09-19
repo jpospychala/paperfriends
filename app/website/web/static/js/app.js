@@ -11,17 +11,21 @@ var vm = new Vue({
   el: "#scene",
   data: {
     model_id: +getParameterByName("model"),
-    editable: "",
-    model: {},
+    editable: "{}",
+    model: {
+      name: "Unnamed",
+      description: "Short description",
+      body: {}
+    },
     error: undefined
   },
   ready: function () {
+    var viewPlace = $(this.$el).find("#view3d")[0];
+    state.init(viewPlace);
+
     $.getJSON(`/api/models/${this.model_id}`, (response) => {
       this.model = response.data;
       this.editable = JSON.stringify(this.model.body, true, 2);
-
-      var viewPlace = $(this.$el).find("#view3d")[0];
-      state.init(viewPlace);
       state.loadModel(this.model.body);
     });
   },
@@ -42,6 +46,20 @@ var vm = new Vue({
         url: `/api/models/${this.model_id}`,
         data: JSON.stringify({model: this.model}),
         success: (response) => {},
+        error: function(response) {this.error = response; },
+        contentType: "application/json",
+        dataType: "json"
+      });
+    },
+    create: function() {
+      this.applyChanges();
+      $.ajax({
+        type: "POST",
+        url: `/api/models/`,
+        data: JSON.stringify({model: this.model}),
+        success: (response) => {
+          window.location = `/?model=${response.data.id}`;
+        },
         error: function(response) {this.error = response; },
         contentType: "application/json",
         dataType: "json"
