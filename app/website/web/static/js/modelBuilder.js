@@ -2,21 +2,35 @@ const PI = Math.PI;
 
 function ModelBuilder() {
   var materials = new Materials();
+  var that = this;
 
   this.buildMesh = function(model) {
     var group = new THREE.Group();
     model.parts.forEach(part => {
       var shape = shapes[part.type];
-      var partMesh = shape.mesh(part, materials);
+      var partMesh = shape.mesh(part, materials, that);
       shape.position(partMesh, part);
       group.add(partMesh);
     });
+    return group;
+  };
 
+  this.center = function(group) {
     var center = new THREE.Group();
     centerGroup(group);
     center.add(group);
     return center;
-  };
+  },
+
+  this.traverse = function(mesh, model) {
+    if (model && model.parts) {
+      var group = this.buildMesh(model);
+      group.add(mesh);
+      return group;
+    }
+
+    return mesh;
+  }
 }
 
 
@@ -24,7 +38,7 @@ const shapes = {
   wheel: {
     mesh: (model, materials) => {
       var geometry = new THREE.CircleGeometry(model.r, 32);
-      var material = materials.get(model.face);
+      var material = materials.get(model.texture);
       return new THREE.Mesh(geometry, material);
     },
     position: (mesh, model) => {
@@ -34,7 +48,7 @@ const shapes = {
     }
   },
   extruded: {
-    mesh: (model, materials) => {
+    mesh: (model, materials, modelBuilder) => {
       var outline = svgPathToPoints(model.outlinePoints);
       outline = connectLastToFirst(outline);
       var shape = pointsToShape(outline);
@@ -45,10 +59,14 @@ const shapes = {
 
       var group = new THREE.Group();
       group.userData.outline = outline;
-      var lmesh = new THREE.Mesh(geometry, materials.get(model.faces[0]));
+      var leftSideModel = model.sides[0];
+      var lmesh = new THREE.Mesh(geometry, materials.get(path("texture", leftSideModel)));
+      lmesh = modelBuilder.traverse(lmesh, leftSideModel);
       group.add(lmesh);
 
-      var rmesh = new THREE.Mesh(geometry, materials.get(model.faces[1]));
+      var rightSideModel = model.sides[1];
+      var rmesh = new THREE.Mesh(geometry, materials.get(path("texture", rightSideModel)));
+      rmesh = modelBuilder.traverse(rmesh, rightSideModel);
       group.add(rmesh);
 
       var front = new THREE.Group();
@@ -57,14 +75,15 @@ const shapes = {
         var sideShape = rect(p1.dx, p1.dy, model.width);
         var shapeGeometry = sideShape.makeGeometry();
         rescaleUvs(shapeGeometry);
-        var sideMesh = new THREE.Mesh(shapeGeometry, materials.get(model.faces[i + 2]));
-
+        var sideModel = model.sides[i + 2];
+        var sideMesh = new THREE.Mesh(shapeGeometry, materials.get(path("texture", sideModel)));
+        sideMesh = modelBuilder.traverse(sideMesh, sideModel);
         front.add(sideMesh);
       }
       group.add(front);
       return group;
     },
-    position: (mesh, model) => {
+    position2: (mesh, model) => {
       var rmesh = mesh.children[1];
       rmesh.position.z = -model.width;
 
@@ -82,20 +101,56 @@ const shapes = {
         var atan =  Math.atan(p1.dx/p1.dy);
         sideMesh.rotateX(PI + upright * atan + horizright + horizleft + downright * (PI - atan));
       }
+    },
+
+    position: (mesh, model) => {
+      var lmesh = mesh.children[0];
+      var bbox = boundingBox(lmesh);
+
+      var rmesh = mesh.children[1];
+      var front = mesh.children[2];
+      var y = 0;
+      var x = 0;
+      var stickySide = Math.floor(front.children.length / 2);
+      for (var i = 0; i < front.children.length; i++) {
+        var sideMesh = front.children[i];
+        var sideBbox = boundingBox(sideMesh);
+        var h = sideBbox.max.y;
+
+        sideMesh.position.set(0, y, 0);
+
+        if (i == stickySide) {
+          var modelheight = bbox.max.y;
+          var p1 = mesh.userData.outline[i-1];
+          var l = p1.x;
+
+          rmesh.position.set(-modelheight, y - l, 0);
+          rmesh.rotateZ(PI/2);
+          rmesh.rotateX(PI);
+          lmesh.position.set(model.width + modelheight, y - l, 0);
+          lmesh.rotateZ(PI/2);
+        }
+
+        y += h;
+      }
     }
   }
 };
 
 function centerGroup(group) {
   group.updateMatrixWorld();
-  var boundingBox = maxBoundingBox(group, new THREE.Box3());
-  var xOfs = Math.abs(boundingBox.max.x-boundingBox.min.x)/2;
-  var zOfs = Math.abs(boundingBox.max.z-boundingBox.min.z)/2;
+  var bbox = boundingBox(group);
+  var xOfs = Math.abs(bbox.max.x-bbox.min.x)/2;
+  var zOfs = Math.abs(bbox.max.z-bbox.min.z)/2;
   group.translateX(-xOfs);
   group.translateZ(zOfs);
 }
 
-function maxBoundingBox (obj, box) {
+function boundingBox (obj, box) {
+  if (!box) {
+    box = new THREE.Box3();
+  }
+
   if (obj.geometry) {
     if (!obj.geometry.boundingBox) {
       obj.geometry.computeBoundingBox();
@@ -106,7 +161,7 @@ function maxBoundingBox (obj, box) {
   }
 
   if (obj.children) {
-    obj.children.forEach(child => maxBoundingBox(child, box));
+    obj.children.forEach(child => boundingBox(child, box));
   }
   return box;
 }
@@ -191,5 +246,8 @@ let rect = function(dx, dy, z) {
   return shape;
 };
 
+let path = (path, obj) => {
+  return obj && obj[path];
+}
 
 export default ModelBuilder;

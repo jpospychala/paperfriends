@@ -77,6 +77,7 @@ var state = {
 
     var modelBuilder = new ModelBuilder();
     cube = modelBuilder.buildMesh(model);
+    cube = modelBuilder.center(cube);
     cube.rotateY(Math.PI/3);
     scene.add(cube);
     render();
