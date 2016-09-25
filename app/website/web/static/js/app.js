@@ -64,6 +64,10 @@ var vm = new Vue({
         contentType: "application/json",
         dataType: "json"
       });
+    },
+    setViewStyle: function(newValue) {
+      state.setViewStyle(newValue);
+      this.applyChanges();
     }
   }
 });

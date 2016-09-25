@@ -3,13 +3,14 @@ const PI = Math.PI;
 function ModelBuilder() {
   var materials = new Materials();
   var that = this;
+  var viewStyle = "view3d";
 
   this.buildMesh = function(model) {
     var group = new THREE.Group();
     model.parts.forEach(part => {
       var shape = shapes[part.type];
       var partMesh = shape.mesh(part, materials, that);
-      shape.position(partMesh, part);
+      shape[viewStyle](partMesh, part);
       group.add(partMesh);
     });
     return group;
@@ -20,7 +21,7 @@ function ModelBuilder() {
     centerGroup(group);
     center.add(group);
     return center;
-  },
+  };
 
   this.traverse = function(mesh, model) {
     if (model && model.parts) {
@@ -30,6 +31,10 @@ function ModelBuilder() {
     }
 
     return mesh;
+  };
+
+  this.setViewStyle = function(newStyle) {
+    viewStyle = newStyle;
   }
 }
 
@@ -41,7 +46,12 @@ const shapes = {
       var material = materials.get(model.texture);
       return new THREE.Mesh(geometry, material);
     },
-    position: (mesh, model) => {
+    view3d: (mesh, model) => {
+      mesh.translateX(model.x);
+      mesh.translateY(model.y);
+      mesh.translateZ(model.z);
+    },
+    view2d: (mesh, model) => {
       mesh.translateX(model.x);
       mesh.translateY(model.y);
       mesh.translateZ(model.z);
@@ -83,7 +93,7 @@ const shapes = {
       group.add(front);
       return group;
     },
-    position2: (mesh, model) => {
+    view3d: (mesh, model) => {
       var rmesh = mesh.children[1];
       rmesh.position.z = -model.width;
 
@@ -103,7 +113,7 @@ const shapes = {
       }
     },
 
-    position: (mesh, model) => {
+    view2d: (mesh, model) => {
       var lmesh = mesh.children[0];
       var bbox = boundingBox(lmesh);
 

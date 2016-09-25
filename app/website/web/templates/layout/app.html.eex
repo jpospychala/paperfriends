@@ -25,9 +25,11 @@
           <input type="text" v-model="model.description">
           <textarea v-model="editable" rows=20 cols=60>
           </textarea>
-          <button type="input" v-on:click="applyChanges()">Preview</button>
-          <button type="input" v-on:click="save()">Save</button>
-          <button type="input" v-on:click="create()">Create</button>
+          <button v-on:click="applyChanges()">Preview</button>
+          <button v-on:click="save()">Save</button>
+          <button v-on:click="create()">Create</button>
+          <button v-on:click="setViewStyle('view3d')">3D</button>
+          <button v-on:click="setViewStyle('view2d')">2D</button>
             {{ error }}
         </div>
       </div>

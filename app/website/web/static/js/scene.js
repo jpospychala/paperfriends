@@ -59,7 +59,7 @@ let onDocumentMouseUp = function(event) {
   lastY = 0;
 };
 
-
+var modelBuilder = new ModelBuilder();
 var state = {
   refresh: newState => {
     cube.rotation.x = newState.x;
@@ -75,12 +75,14 @@ var state = {
   loadModel: function(model) {
     scene.children.length > 0 ? scene.remove(scene.children[0]) : undefined;
 
-    var modelBuilder = new ModelBuilder();
     cube = modelBuilder.buildMesh(model);
     cube = modelBuilder.center(cube);
     cube.rotateY(Math.PI/3);
     scene.add(cube);
     render();
+  },
+  setViewStyle: function(newStyle) {
+    modelBuilder.setViewStyle(newStyle);
   }
 };
 
