@@ -1,11 +1,6 @@
 import "phoenix_html";
 import socket from "./socket";
-import state from "./scene";
-import sync from "./sync";
-
-state.name = "scene";
-sync.start(socket, state);
-
+import scene from "./scene";
 
 var vm = new Vue({
   el: "#scene",
@@ -21,12 +16,12 @@ var vm = new Vue({
   },
   ready: function () {
     var viewPlace = $(this.$el).find("#view3d")[0];
-    state.init(viewPlace);
+    scene.init(viewPlace);
 
     $.getJSON(`/api/models/${this.model_id}`, (response) => {
       this.model = response.data;
       this.editable = JSON.stringify(this.model.body, true, 2);
-      state.loadModel(this.model.body);
+      scene.loadModel(this.model.body);
     });
   },
   methods: {
@@ -34,7 +29,7 @@ var vm = new Vue({
       try {
         this.model.body = JSON.parse(this.editable);
         this.error = undefined;
-        state.loadModel(this.model.body);
+        scene.loadModel(this.model.body);
       } catch (ex) {
         this.error = ex;
       }
@@ -66,7 +61,7 @@ var vm = new Vue({
       });
     },
     setViewStyle: function(newValue) {
-      state.setViewStyle(newValue);
+      scene.setViewStyle(newValue);
       this.applyChanges();
     }
   }
