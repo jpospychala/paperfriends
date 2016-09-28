@@ -1,24 +1,24 @@
 import ModelBuilder from "./modelBuilder";
 import CursorBasedRotate from "./cursorBasedRotate";
 
-var tscene;
-var camera;
-var renderer;
+function Scene() {
+  var scene;
+  var camera;
+  var renderer;
 
-var render = function () {
-  requestAnimationFrame( render );
+  var render = function () {
+    requestAnimationFrame( render );
 
-  renderer.render(tscene, camera);
-};
+    renderer.render(scene, camera);
+  };
 
-var modelBuilder = new ModelBuilder();
-var rotate = new CursorBasedRotate();
-var scene = {
-  cube: undefined,
-  init: (element) => {
+  var modelBuilder = new ModelBuilder();
+  var rotate = new CursorBasedRotate();
+
+  this.init = (element) => {
     var width = element.clientWidth;
     var height = window.innerHeight *0.6;
-    tscene = new THREE.Scene();
+    scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera( 50, width/height, 0.1, 1000 );
     camera.position.z = 300;
     camera.position.y = 50;
@@ -28,20 +28,22 @@ var scene = {
     renderer.setClearColor(0xffffff, 1);
     rotate.attach(renderer.domElement);
     element.appendChild( renderer.domElement );
-  },
-  loadModel: function(model) {
-    tscene.children.length > 0 ? tscene.remove(tscene.children[0]) : undefined;
+  };
+
+  this.loadModel = function(model) {
+    scene.children.length > 0 ? scene.remove(scene.children[0]) : undefined;
 
     var cube = modelBuilder.buildMesh(model);
-    scene.cube = modelBuilder.center(cube);
-    scene.cube.rotateY(Math.PI/3);
-    tscene.add(scene.cube);
-    rotate.setTarget(scene.cube);
+    cube = modelBuilder.center(cube);
+    modelBuilder.setDefaultPosition(cube);
+    scene.add(cube);
+    rotate.setTarget(cube);
     render();
-  },
-  setViewStyle: function(newStyle) {
+  };
+
+  this.setViewStyle = function(newStyle) {
     modelBuilder.setViewStyle(newStyle);
   }
 };
 
-export default scene;
+export default Scene;

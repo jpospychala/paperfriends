@@ -1,27 +1,29 @@
 import "phoenix_html";
 import socket from "./socket";
-import scene from "./scene";
+import Scene from "./scene";
 
 var vm = new Vue({
   el: "#scene",
   data: {
     model_id: +getParameterByName("model"),
     editable: "{}",
+    print: false,
     model: {
       name: "Unnamed",
       description: "Short description",
       body: {}
     },
+    scene: new Scene(),
     error: undefined
   },
   ready: function () {
     var viewPlace = $(this.$el).find("#view3d")[0];
-    scene.init(viewPlace);
+    this.scene.init(viewPlace);
 
     $.getJSON(`/api/models/${this.model_id}`, (response) => {
       this.model = response.data;
       this.editable = JSON.stringify(this.model.body, true, 2);
-      scene.loadModel(this.model.body);
+      this.scene.loadModel(this.model.body);
     });
   },
   methods: {
@@ -29,7 +31,7 @@ var vm = new Vue({
       try {
         this.model.body = JSON.parse(this.editable);
         this.error = undefined;
-        scene.loadModel(this.model.body);
+        this.scene.loadModel(this.model.body);
       } catch (ex) {
         this.error = ex;
       }
@@ -60,8 +62,14 @@ var vm = new Vue({
         dataType: "json"
       });
     },
-    setViewStyle: function(newValue) {
-      scene.setViewStyle(newValue);
+    set3dView: function() {
+      this.scene.setViewStyle("view3d");
+      this.print = false;
+      this.applyChanges();
+    },
+    setPrintView: function() {
+      this.scene.setViewStyle("view2d");
+      this.print = true;
       this.applyChanges();
     }
   }

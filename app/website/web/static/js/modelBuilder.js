@@ -23,6 +23,11 @@ function ModelBuilder() {
     return center;
   };
 
+  this.setDefaultPosition = function(mesh) {
+    var angleY = viewStyle === "view3d" ? Math.PI/3 : 0;
+    mesh.rotateY(angleY);
+  }
+
   this.traverse = function(mesh, model) {
     if (model && model.parts) {
       var group = this.buildMesh(model);
