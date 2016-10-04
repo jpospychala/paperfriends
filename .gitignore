@@ -1,2 +1,3 @@
-./app/website/node_modules
-./app/website/deps
+./app/backend/node_modules
+./app/frontend/build
+./app/frontend/node_modules
