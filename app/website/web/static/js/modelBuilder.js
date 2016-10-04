@@ -23,11 +23,6 @@ function ModelBuilder() {
     return center;
   };
 
-  this.setDefaultPosition = function(mesh) {
-    var angleY = viewStyle === "view3d" ? Math.PI/3 : 0;
-    mesh.rotateY(angleY);
-  }
-
   this.traverse = function(mesh, model) {
     if (model && model.parts) {
       var group = this.buildMesh(model);
@@ -156,8 +151,10 @@ function centerGroup(group) {
   group.updateMatrixWorld();
   var bbox = boundingBox(group);
   var xOfs = Math.abs(bbox.max.x-bbox.min.x)/2;
+  var yOfs = Math.abs(bbox.max.y-bbox.min.y)/2;
   var zOfs = Math.abs(bbox.max.z-bbox.min.z)/2;
   group.translateX(-xOfs);
+  group.translateY(-yOfs);
   group.translateZ(zOfs);
 }
 

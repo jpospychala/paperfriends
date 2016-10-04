@@ -3,13 +3,16 @@ function CursorBasedRotate() {
   var lastY = 0;
   var mesh;
   var that = this;
-  this.isChanging = false;
+  var enabled = true;
+
+  this.enable = function(newVal) {
+    enabled = newVal;
+  }
 
   this.attach = function(domElement) {
     lastX = 0;
     lastY = 0;
     domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
-    domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
     domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
   };
   
@@ -23,6 +26,10 @@ function CursorBasedRotate() {
       return;
     }
 
+    if (!enabled) {
+      return;
+    }
+
     let newX = event.clientX / window.innerWidth;
     mesh.rotation.y += 10*(newX - (lastX || newX));
     lastX = newX;
@@ -32,12 +39,8 @@ function CursorBasedRotate() {
     lastY = newY;
   };
 
-  let onDocumentMouseDown = function(event) {
-    that.isChanging = true;
-  };
 
   let onDocumentMouseUp = function(event) {
-    that.isChanging = false;
     lastX = 0;
     lastY = 0;
   };
