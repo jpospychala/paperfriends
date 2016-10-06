@@ -1,4 +1,3 @@
-import socket from "./socket";
 import Scene from "./scene";
 
 var vm = new Vue({
