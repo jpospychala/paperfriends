@@ -29,16 +29,18 @@ services:
       dockerfile: docker/phoenix.Dockerfile
     image: phoenix
 
-  paperfriends:
-    container_name: paperfriends
+  node:
+    build:
+      context: .
+      dockerfile: docker/node.Dockerfile
+    container_name: node
     env_file:
       - env_variables
     volumes:
       - ./app:/app
-      - /root/.mix
-    image: phoenix
-    working_dir: /app/website
-    entrypoint: mix phoenix.server
+    image: node
+    working_dir: /app/backend
+    entrypoint: node src/server.js
     ports:
       - "4000:4000"
     links:

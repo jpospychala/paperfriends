@@ -19,7 +19,7 @@ var vm = new Vue({
     this.scene.init(viewPlace);
 
     $.getJSON(`/api/models/${this.model_id}`, (response) => {
-      this.model = response.data;
+      this.model = response;
       this.editable = JSON.stringify(this.model.body, true, 2);
       this.scene.loadModel(this.model.body);
     });
@@ -53,7 +53,7 @@ var vm = new Vue({
         url: `/api/models/`,
         data: JSON.stringify({model: this.model}),
         success: (response) => {
-          window.location = `/?model=${response.data.id}`;
+          window.location = `/?model=${response.id}`;
         },
         error: function(response) {this.error = response; },
         contentType: "application/json",
