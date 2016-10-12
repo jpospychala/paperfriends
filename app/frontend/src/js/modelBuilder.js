@@ -16,11 +16,21 @@ function ModelBuilder() {
     return group;
   };
 
-  this.center = function(group) {
-    var center = new THREE.Group();
-    centerGroup(group);
-    center.add(group);
-    return center;
+  this.alignCenter = function(obj, obj2) {
+    var bbox = this.boundingBox(obj);
+    var bbox2 = this.boundingBox(obj2);
+    
+    var halfSize = bbox.size().multiply(new THREE.Vector3(-0.5, -0.5, 0.5));
+    console.log('alignCenter', obj.position, obj2.position, halfSize);
+    obj.position
+      .set(0, 0, 0)
+      .sub(bbox.min)
+      .add(obj2.position.multiply(new THREE.Vector3(1, 1, 0)))
+      .add(halfSize);
+  };
+
+  this.boundingBox = function(obj) {
+    return boundingBox(obj);
   };
 
   this.traverse = function(mesh, model) {
@@ -37,7 +47,6 @@ function ModelBuilder() {
     viewStyle = newStyle;
   }
 }
-
 
 const shapes = {
   wheel: {
@@ -147,19 +156,9 @@ const shapes = {
   }
 };
 
-function centerGroup(group) {
-  group.updateMatrixWorld();
-  var bbox = boundingBox(group);
-  var xOfs = Math.abs(bbox.max.x-bbox.min.x)/2;
-  var yOfs = Math.abs(bbox.max.y-bbox.min.y)/2;
-  var zOfs = Math.abs(bbox.max.z-bbox.min.z)/2;
-  group.translateX(-xOfs);
-  group.translateY(-yOfs);
-  group.translateZ(zOfs);
-}
-
 function boundingBox (obj, box) {
   if (!box) {
+    obj.updateMatrixWorld();
     box = new THREE.Box3();
   }
 

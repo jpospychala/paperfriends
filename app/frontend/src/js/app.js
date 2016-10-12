@@ -5,7 +5,7 @@ var vm = new Vue({
   data: {
     model_id: +getParameterByName("model"),
     editable: "{}",
-    print: false,
+    print: !!getParameterByName("print"),
     model: {
       name: "Unnamed",
       description: "Short description",
@@ -22,6 +22,8 @@ var vm = new Vue({
       this.model = response;
       this.editable = JSON.stringify(this.model.body, true, 2);
       this.scene.loadModel(this.model.body);
+      this.scene.setViewStyle(this.print ? "view2d" : "view3d");
+      this.applyChanges();
     });
   },
   methods: {
