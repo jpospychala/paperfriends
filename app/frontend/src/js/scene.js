@@ -54,11 +54,9 @@ function Scene() {
       camera.position.x = 0;
       camera.position.y = 0;
 
-      var bbox = modelBuilder.boundingBox(cube);
-      //modelBuilder.alignCenter("XY", cube, camera);
+      var cubeSize = modelBuilder.boundingBox(cube).size();
       modelBuilder.alignCenter(cube, camera);
-      //camera.position.x = -100;
-      camera.position.z = 600;
+      zoomToFit(camera,cubeSize);
     }
     rotate.setTarget(viewStyle == "view3d" ? cube : undefined);
 
@@ -69,6 +67,15 @@ function Scene() {
 
   this.setViewStyle = function(newStyle) {
     viewStyle = newStyle;
+  }
+
+  function zoomToFit(camera, cubeSize) {
+    if (cubeSize.x/width > cubeSize.y/height) {
+      var wTh = width/height;
+      camera.position.z =wTh*cubeSize.x/Math.tan(camera.fov*0.5*THREE.Math.DEG2RAD)
+    } else {
+      camera.position.z = 0.5*cubeSize.y/Math.tan(camera.fov*0.5*THREE.Math.DEG2RAD)
+    }
   }
 };
 
